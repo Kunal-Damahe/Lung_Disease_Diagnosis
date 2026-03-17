@@ -1,4 +1,5 @@
 import sys
+import os
 
 from xray.clould_storage.s3_operations import S3Operation
 from xray.constant.training_pipeline import *
@@ -11,12 +12,22 @@ from xray.logger import logging
 class DataIngestion:
     def __init__(self, data_ingestion_config: DataIngestionConfig):
         self.data_ingestion_config = data_ingestion_config
-
         self.s3 = S3Operation()
 
     def get_data_from_s3(self) -> None:
         try:
-            logging.info("Entered the get_data_from_s3 method of Data ingestion class")
+            logging.info("Entered the get_data_from_s3 method")
+
+            # ✅ CHECK IF DATA ALREADY EXISTS
+            if os.path.exists(self.data_ingestion_config.data_path):
+                logging.info("✅ Data already exists locally. Skipping S3 download.")
+                print("✅ Data already exists locally. Skipping download.")
+                return
+
+            # ✅ CREATE DIRECTORY IF NOT EXISTS
+            os.makedirs(self.data_ingestion_config.data_path, exist_ok=True)
+
+            logging.info("⬇️ Downloading data from S3...")
 
             self.s3.sync_folder_from_s3(
                 folder=self.data_ingestion_config.data_path,
@@ -24,15 +35,13 @@ class DataIngestion:
                 bucket_folder_name=self.data_ingestion_config.s3_data_folder,
             )
 
-            logging.info("Exited the get_data_from_s3 method of Data ingestion class")
+            logging.info("✅ Data downloaded successfully from S3")
 
         except Exception as e:
             raise XRayException(e, sys)
 
     def initiate_data_ingestion(self) -> DataIngestionArtifact:
-        logging.info(
-            "Entered the initiate_data_ingestion method of Data ingestion class"
-        )
+        logging.info("Entered initiate_data_ingestion method")
 
         try:
             self.get_data_from_s3()
@@ -42,9 +51,7 @@ class DataIngestion:
                 test_file_path=self.data_ingestion_config.test_data_path,
             )
 
-            logging.info(
-                "Exited the initiate_data_ingestion method of Data ingestion class"
-            )
+            logging.info("Exited initiate_data_ingestion method")
 
             return data_ingestion_artifact
 

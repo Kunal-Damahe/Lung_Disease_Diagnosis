@@ -2,177 +2,201 @@
 
 ## 📌 Problem Statement
 
-Pneumonia is an inflammatory condition of the lungs affecting primarily the small air sacs (alveoli). It can be life-threatening if not diagnosed early.
+Pneumonia is a serious lung infection that can be life-threatening if not diagnosed early. Chest X-rays are commonly used for diagnosis, but interpretation requires expert radiologists and can be time-consuming.
 
-Manual diagnosis using chest X-rays requires expert radiologists and can sometimes be time-consuming. In many regions, medical facilities lack sufficient specialists, which delays diagnosis.
+This project builds an AI-powered system to automatically classify chest X-ray images into:
 
-This project aims to build an AI-based deep learning system that can classify chest X-ray images into:
+* ✅ NORMAL
+* ❌ PNEUMONIA
 
-- ✅ NORMAL
-- ❌ PNEUMONIA
-
-The goal is to assist medical professionals by providing fast and automated screening support.
+The goal is to assist healthcare professionals with **fast, reliable, and scalable diagnosis support**.
 
 ---
 
 ## 🚀 Solution Approach
 
-We developed an end-to-end Deep Learning pipeline that includes:
+This project implements a **complete end-to-end MLOps pipeline**:
 
-1. Data Ingestion (from AWS S3)
+1. Data Ingestion (AWS S3 → Local Cache)
 2. Data Transformation & Augmentation
-3. Model Training (Custom CNN Architecture)
+3. Model Training (Transfer Learning using ResNet18)
 4. Model Evaluation
-5. Model Pusher (Upload best model to S3)
-6. FastAPI-based deployment
-7. Docker containerization
-
-The trained model is deployed as an API that allows users to upload X-ray images and receive predictions.
+5. Model Pusher (BentoML)
+6. FastAPI Deployment
+7. Docker Containerization
 
 ---
 
-## 📊 Dataset Used
+## 📊 Dataset
 
-- Publicly available chest X-ray dataset
-- Binary classification:
-  - NORMAL
-  - PNEUMONIA
-- Dataset structure:
+* Public chest X-ray dataset
+* Binary classification:
 
+  * NORMAL
+  * PNEUMONIA
 
+Structure:
+
+```
 chest_xray/
 ├── train/
-│ ├── NORMAL/
-│ └── PNEUMONIA/
+│   ├── NORMAL/
+│   └── PNEUMONIA/
 ├── test/
-│ ├── NORMAL/
-│ └── PNEUMONIA/
-
-
+│   ├── NORMAL/
+│   └── PNEUMONIA/
+```
 
 ---
 
-## 🧠 Model Used
+## 🧠 Model
 
-- Custom CNN Architecture
-- Multiple Convolution Blocks
-- Batch Normalization
-- ReLU Activation
-- Max Pooling
-- Global Average Pooling
-- LogSoftmax Output Layer
+### 🔥 Transfer Learning (ResNet18)
+
+* Pretrained on ImageNet
+* Fine-tuned for medical imaging
+* Frozen backbone + custom classifier
+* Dropout for regularization
+
+### ⚙️ Key Improvements
+
+* Data Augmentation (Rotation, Flip, Color Jitter)
+* Proper Normalization (ImageNet stats)
+* Learning Rate Optimization
+* Batch Size tuning
+* Overfitting reduction
+
+---
+
+## 📈 Model Performance
+
+| Metric            | Value    |
+| ----------------- | -------- |
+| Training Accuracy | ~85–90%  |
+| Test Accuracy     | **~87%** |
+| Generalization    | Good     |
 
 ---
 
 ## 🏗 Project Architecture
 
+```
 xray/
 │
 ├── components/
-│ ├── data_ingestion
-│ ├── data_transformation
-│ ├── model_training
-│ ├── model_evaluation
-│ ├── model_pusher
+│   ├── data_ingestion
+│   ├── data_transformation
+│   ├── model_training
+│   ├── model_evaluation
+│   ├── model_pusher
 │
-├── exception/
-├── logger/
+├── pipeline/
+├── entity/
+├── constant/
 ├── utils/
+├── logger/
+├── exception/
 │
 ├── app.py
 ├── train.py
 ├── requirements.txt
-
-
-
----
-
-## ⚙ Tech Stack Used
-
-- Python
-- PyTorch
-- FastAPI
-- AWS (S3, EC2)
-- Docker
-- GitHub Actions (CI/CD)
+```
 
 ---
 
-## ☁ Infrastructure Required
+## ⚙ Tech Stack
 
-- AWS S3 (Dataset & Model Storage)
-- AWS EC2 (Deployment)
-- Docker
-- GitHub
+* Python
+* PyTorch
+* FastAPI
+* AWS S3
+* BentoML
+* Docker
+* GitHub Actions (CI/CD)
 
 ---
 
-## 🛠 How To Run (Local Setup)
+## ☁ Infrastructure
 
-### 1️⃣ Clone Repository
+* AWS S3 → Dataset + Model Storage
+* Local Cache → Faster training (no repeated downloads)
+* Docker → Containerized deployment
+* FastAPI → Model serving
+
+---
+
+## 🛠 How To Run
+
+### 1️⃣ Clone Repo
 
 ```bash
 git clone <your_repo_url>
 cd <project_folder>
+```
 
+### 2️⃣ Create Environment
 
-2️⃣ Create Virtual Environment
-
-Using Conda:
-
-conda create -n xray python=3.9
-conda activate xray
-
-OR using venv:
-
+```bash
 python -m venv venv
 venv\Scripts\activate
+```
 
+### 3️⃣ Install Dependencies
 
-3️⃣ Install Requirements
+```bash
 pip install -r requirements.txt
+```
 
+### 4️⃣ Set AWS Credentials
 
+```bash
+set AWS_ACCESS_KEY_ID=your_key
+set AWS_SECRET_ACCESS_KEY=your_secret
+set AWS_DEFAULT_REGION=ap-south-1
+```
 
-4️⃣ Set AWS Environment Variables (Windows PowerShell)
-$env:AWS_ACCESS_KEY_ID="your_access_key"
-$env:AWS_SECRET_ACCESS_KEY="your_secret_key"
-$env:AWS_DEFAULT_REGION="ap-south-1"
+### 5️⃣ Train Model
 
-
-
-5️⃣ Train Model
+```bash
 python train.py
-6️⃣ Run API Server
+```
+
+### 6️⃣ Run API
+
+```bash
 uvicorn app:app --reload
+```
 
-Open in browser:
+👉 Open: http://127.0.0.1:8000/docs
 
-http://127.0.0.1:8000/docs  
+---
 
+## 🔥 Key Features
 
+* End-to-End ML Pipeline
+* Transfer Learning (ResNet18)
+* Optimized Training (Reduced Overfitting)
+* AWS Integration
+* Production-ready API
+* Dockerized Deployment
 
-🎯 Conclusion
+---
 
-This project demonstrates an end-to-end Deep Learning + MLOps workflow for medical image classification.
+## 🎯 Conclusion
+
+This project demonstrates a **production-ready deep learning system** for medical image classification.
 
 It covers:
 
-**
-Model Development
+* Model Development
+* Pipeline Engineering
+* Cloud Integration
+* Deployment
 
-Modular ML Pipeline
+👉 Can be extended to real-world hospital systems.
 
-Cloud Storage Integration
+---
 
-API Deployment
+## 👨‍💻 Author
 
-Containerization
-
-Production Readiness
-
-
-**
-
-
-The system can assist doctors in faster screening and decision-making.
+**Kunal Damahe**

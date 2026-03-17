@@ -35,14 +35,13 @@ class DataTransformation:
             train_transform: transforms.Compose = transforms.Compose(
                 [
                     transforms.Resize(self.data_transformation_config.RESIZE),
-                    transforms.CenterCrop(self.data_transformation_config.CENTERCROP),
-                    transforms.ColorJitter(
-                        **self.data_transformation_config.color_jitter_transforms
-                    ),
+                    transforms.RandomResizedCrop(self.data_transformation_config.CENTERCROP),
                     transforms.RandomHorizontalFlip(),
                     transforms.RandomRotation(
                         self.data_transformation_config.RANDOMROTATION
                     ),
+                    transforms.ColorJitter(
+                        **self.data_transformation_config.color_jitter_transforms),
                     transforms.ToTensor(),
                     transforms.Normalize(
                         **self.data_transformation_config.normalize_transforms
@@ -110,6 +109,8 @@ class DataTransformation:
             test_loader: DataLoader = DataLoader(
                 test_data, **self.data_transformation_config.data_loader_params
             )
+
+            print("Class mapping:", train_data.class_to_idx)
 
             logging.info("Exited the data_loader method of Data transformation class")
 
