@@ -150,7 +150,7 @@ flowchart LR
 ### 1️⃣ Clone Repo
 
 ```bash
-git clone <your_repo_url>
+git clone https://github.com/KunalDamahe/Lung-Disease-Diagnosis.git
 cd <project_folder>
 ```
 
