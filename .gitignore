@@ -7,6 +7,7 @@ test_sync_folder/
 *.jpg
 *.jpeg
 *.png
+!docs/assets/*.png
 *.h5
 *.pt
 *.pth

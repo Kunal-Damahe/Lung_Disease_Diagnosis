@@ -85,30 +85,38 @@ not used for tuning.
 The reported model uses inverse-frequency class weights, partial ResNet18
 fine-tuning, and a decision threshold selected only on the validation split.
 
+### Training History
+
+![Training and validation curves](docs/assets/training_curves.png)
+
+The widening loss gap after the selected epoch shows why early stopping is
+necessary: additional epochs improve training accuracy but reduce generalization.
+
+### Held-Out Evaluation
+
+![Held-out confusion matrix](docs/assets/confusion_matrix.png)
+
+<details>
+<summary>View representative correct and incorrect predictions</summary>
+
+![Representative held-out predictions](docs/assets/sample_predictions.png)
+
+</details>
+
 ---
 
 ## 🏗 Project Architecture
 
-```
-xray/
-│
-├── components/
-│   ├── data_ingestion
-│   ├── data_transformation
-│   ├── model_training
-│   ├── model_evaluation
-│   ├── model_pusher
-│
-├── pipeline/
-├── entity/
-├── constant/
-├── utils/
-├── logger/
-├── exception/
-│
-├── app.py
-├── train.py
-├── requirements.txt
+```mermaid
+flowchart LR
+    A["AWS S3 or local X-rays"] --> B["Validated ingestion and cache"]
+    B --> C["Augmentation and stratified split"]
+    C --> D["Weighted ResNet18 fine-tuning"]
+    D --> E["Validation checkpoint and threshold selection"]
+    E --> F["Held-out test evaluation"]
+    E --> G["Versioned model checkpoint"]
+    G --> H["FastAPI inference service"]
+    H --> I["Docker container"]
 ```
 
 ---
@@ -119,9 +127,8 @@ xray/
 * PyTorch
 * FastAPI
 * AWS S3
-* BentoML
 * Docker
-* GitHub Actions (CI/CD)
+* Git and GitHub
 
 ---
 
@@ -131,6 +138,10 @@ xray/
 * Local Cache → Faster training (no repeated downloads)
 * Docker → Containerized deployment
 * FastAPI → Model serving
+
+### FastAPI Interface
+
+![FastAPI Swagger interface](docs/assets/api_docs.png)
 
 ---
 
@@ -214,7 +225,8 @@ docker compose down
 
 ## 🎯 Conclusion
 
-This project demonstrates a **production-ready deep learning system** for medical image classification.
+This project demonstrates a reproducible, containerized deep-learning prototype
+for medical image classification.
 
 It covers:
 
@@ -223,7 +235,8 @@ It covers:
 * Cloud Integration
 * Deployment
 
-👉 Can be extended to real-world hospital systems.
+The model is intended for learning and portfolio demonstration. Its NORMAL
+recall remains a known limitation, and it is **not validated for clinical use**.
 
 ---
 
